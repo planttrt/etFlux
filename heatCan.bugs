@@ -1,39 +1,30 @@
 model{
   for(i in 1:n){
-#    Snet[i] <- (1 - albedo - transmissivity) * Si[i]
     Snet[i] <- (1 - albedo) * Si[i]
     THi[i] <- eSky * Sigma * (Tair[i] + 273.15)^4
-    THo[i] <- eSur * Sigma * (Tsur[i] + 273.15)^4
-#    G[i] <- Cgrnd * (Snet[i] + THi[i] - THo[i])
-#    G[i] <- Cgrnd * (Snet[i])
-    H[i] <- Cconv * WS[i]^Aconv * (Tsur[i] - Tair[i])
-    
-#    LE[i] <- Snet[i] + THi[i] - THo[i] - G[i] - H[i]
-    LE[i] <- Snet[i] + THi[i] - THo[i] - H[i]
+    THo[i] <- -eSur * Sigma * (Tsur[i] + 273.15)^4
+    H[i] <- -Cconv * WS[i]^Aconv * (Tsur[i] - Tair[i])
+    LE[i] <- -(Snet[i] + THi[i] + THo[i] + H[i])
     Lambda[i] <- 2502 - 2.308*Tair[i]
     
-    ET[i] ~ dnorm(eta * LE[i] / Lambda[i] *24*3.6, invvar)T(0,)
+    ET[i] ~ dnorm(eta * -LE[i] / Lambda[i] *24*3.6, invvar)T(0,)
+    ETpred[i] ~ dnorm(eta * -LE[i] / Lambda[i] *24*3.6, invvar)T(0,)
+    ETobs[i] <- ET[i]
 	}
 
   Sigma <- 5.670367 * 10^-8
+
   albedo ~ dunif(0.1, .25)
-#  transmissivity ~ dunif(0,.1)
-  eSky ~ dunif(0.60, .90)
-  eSur ~ dunif(0.92, .999)
-  #Cgrnd ~ dunif(0, .2)
-  Cconv ~ dnorm(0, .0001)T(0,)
-  Aconv ~ dunif(0.5, .8)
-#  Aconv <- 0.5
   eta ~ dunif(0,1)
   
-	invvar   ~ dgamma(0.01, 0.01)
+  eSky ~ dunif(0.65, .85)
+  eSur ~ dunif(0.93, .99)
+  Cconv ~ dnorm(0, .0001)T(0,)
+  Aconv ~ dunif(0.7999, .8)
+  
+	invvar   ~ dgamma(0.1, 0.1)
   sigma <- 1/sqrt(invvar)
   
 #  invvar <- pow(sigma, -2)
 #	sigma ~ dunif(0, 1)
-	
-	for(i in 1:n){
-	  ETpred[i] ~ dnorm(eta*LE[i] / Lambda[i] *24*3.6, invvar)T(0,)
-	  ETobs[i] <- ET[i]
-	}
 }
