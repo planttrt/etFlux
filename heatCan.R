@@ -5,33 +5,21 @@ source('heatCanFunc.R')
 
 load('~/Projects/transFlux/bothSites.Rdata')
 #pk <- na.omit(transData[Site=='PK', .(TA, RgOpen, Rg, LST, WS, Tr= ET, Site=1)])
-pk <- na.omit(transData[Site=='PK', .(YearCon, Year, DOY, TA, SOL = RgOpen, Rg, LST, WS, Tr = TR, Site = 1)])
-bw <- na.omit(transData[Site=='BW', .(YearCon, Year, DOY, TA, SOL = RgOpen, Rg, LST, WS, Tr = TR, Site = 2)])
-
-tmp1 <- pk[1:500,]
-tmp1$Site <- 1
-tmp1$Tr <- simulateET(tmp1, abs = .4, eSky = .70, eSur = .95, Cconv = 10, Aconv = .8, sigma = 1)
-tmp2 <- pk[1:500,]
-tmp2$Site <- 2
-tmp2$Tr <- simulateET(tmp2, abs = .3, eSky = .65, eSur = .98, Cconv = 5, Aconv = .5, sigma = 1)
-
-df <- rbind(tmp1, tmp2)
-
-df <- rbind(pk, bw, pk2)
+pk <- na.omit(transData[Site=='PK', .(YearCon, Year, DOY, TA, SOL = RgOpen, Rg, LST, WS, TR = ET)])
+#bw <- na.omit(transData[Site=='BW', .(YearCon, Year, DOY, TA, SOL = RgOpen, Rg, LST, WS, TR = TR)])
+df <- pk[Year%in%c(2009)]
+#2009, 2007
 dim(df)
-# df[,plot(Rg, Sdifopen)]
-# abline(0,1)
-jags <- jags.model('heatCanPerSite.bugs',
+
+jags <- jags.model('heatCan.bugs',
                    data = list('Si' = df$SOL,
                                'Tair' = df$TA,
                                'Tsur' = df$LST,
                                'WS' = df$WS,
-                               'ET' = df$Tr,
-                               's' = 2,
-                                Site = df$Site,
+                               'ET' = df$TR,
                                'n' = nrow(df)),
                    n.chains = 1,
-                   quiet = F)
+                   quiet = T)
 
 update(jags, 1000)
 samples <- jags.samples(jags,n.iter = 1000,
@@ -39,7 +27,7 @@ samples <- jags.samples(jags,n.iter = 1000,
                           'eSur',
                           'eSky',
                           'Cconv',
-                           'Aconv',
+                          'Aconv',  
                           'sigma',
                           'ETpred',  
                           'ETobs',
@@ -60,10 +48,10 @@ obs <- apply(samples$ETobs, 1, mean)
 
 #ETpred <- predictET(df, samples)
 
-plotObsPred(obs, pred, nbin = 10)
+plotObsPred(obs, pred, nbin = 12)
 abline(0,1,col='red')
 lm(pred~obs-1)
-print(cor(obs, pred)^2)
+print(cor(obs, pred))
 
 # plotObsPred(obs, pred, nbin = 10, breaks = seq(0,9,1.5), xlim = c(0.5,9), ylim=c(0.5,9))
 # abline(0,1,col='red')
