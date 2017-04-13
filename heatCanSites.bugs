@@ -1,0 +1,29 @@
+model{
+
+  for(i in 1:n){
+    Snet[i] <- abs[Sites[i]] * Si[i]
+    THi[i] <- eSky[Sites[i]] * Sigma * (Tair[i] + 273.15)^4
+    THo[i] <- -eSur[Sites[i]] * Sigma * (Tsur[i] + 273.15)^4
+    H[i] <- -Cconv[Sites[i]] * WS[i]^Aconv[Sites[i]] * (Tsur[i] - Tair[i])
+    LE[i] <- -(Snet[i] + THi[i] + THo[i] + H[i])
+    Lambda[i] <- 2502 - 2.308*Tair[i]
+    
+    ET[i] ~ dnorm( -LE[i] / Lambda[i] *24*3.6, invvar[Sites[i]])T(0,)
+    ETpred[i] ~ dnorm( -LE[i] / Lambda[i] *24*3.6, invvar[Sites[i]])T(0,)
+    ETobs[i] <- ET[i]
+	}
+
+  Sigma <- 5.670367 * 10^-8
+
+  for(s in 1:ns){
+    abs[s] ~ dunif(0,1)
+    
+    eSky[s] ~ dunif(0.65, .85)
+    eSur[s] ~ dunif(0.93, .99)
+    Cconv[s] ~ dnorm(0, .0001)T(0,)
+    Aconv[s] ~ dunif(0.5, .8)
+    
+  	invvar[s]   ~ dgamma(0.1, 0.1)
+    sigma[s] <- 1/sqrt(invvar[s])
+  }
+}

@@ -34,7 +34,6 @@ ameri[SW_IN<0, SW_IN:=0]
 ameri[,Year:=year(Time)]
 ameri[,DOY:=yday(Time)]
 ameri[,Hour:=hour(Time)+minute(Time)/60]
-
 ameri
 
 

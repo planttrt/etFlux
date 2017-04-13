@@ -22,9 +22,9 @@ LST <- data.table(Year = LST$LST_Day_1km$Year,
                   GoodQuality = NA)
 LST[,Emissivity := (Emis_31+Emis_32)/2]
 LST[QC_Day%%4==0, GoodQuality:=T]
-
+LST[,Hour:=Day_view_time]
 LST <- na.omit(LST)
-LST
 
+LST
 
 
