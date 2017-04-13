@@ -48,7 +48,7 @@ obs <- apply(samples$ETobs, 1, mean)
 
 #ETpred <- predictET(df, samples)
 
-plotObsPred(obs, pred, nbin = 12)
+plotObsPred(obs, pred, nbin = 15)
 abline(0,1,col='red')
 lm(pred~obs-1)
 print(cor(obs, pred))
