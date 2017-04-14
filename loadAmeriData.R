@@ -2,7 +2,7 @@ library(data.table)
 library(lubridate)
 
 ameriflux <- list()
-sites <- read.csv('data/sites.csv')
+sites <- as.data.table(read.csv('data/sites.csv'))
 sites$Code <- gsub('US-','',sites$Code)
 
 # ameriflux$Akn <- read.csv('data/ameriflux/csv/AMF_US-Akn_BASE_HH_4-1.csv', skip = 2)

@@ -31,7 +31,7 @@ predictET <- function(df,
   Aconv <- t(apply(Aconv, 1:2, mean))
   sigma <- t(apply(sigma, 1:2, mean))
     
-  Snet <- abs %*% df$SOL
+  Snet <- abs %*% df$RS
   THi <- Sigma*eSky %*% (df$TA + 273.15)^4
   THo <- - Sigma * eSur %*% (df$LST + 273.15)^4
   H <- - sweep(sweep( exp(Aconv%*%log(df$WS)), 1, c(Cconv), '*'), 2, (df$LST - df$TA),'*')

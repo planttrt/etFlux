@@ -3,13 +3,13 @@ table(ameriLST$Site)
 # ChR Dk2 Dk3 NC2
 
 #df <- ameriLST[Site=='KS2', ]
-df <- ameriLST[Site%in%c('ChR', 'Dk2', 'Dk3', 'NC2')]
+df <- ameriLST[Site%in%c('ChR', 'Dk2', 'NC2')]
 df[,SitesID:=as.numeric(as.factor(as.character(Site)))]
 # df <- ameriLST[Site%in%c('ChR', 'Dk2')]
 dim(df)
 
 dfSites <- df$SitesID
-
+dfSites <- rep(1, length(dfSites))
 ns <- length(unique(dfSites))
 
 jags <- jags.model('heatCanSites.bugs',
@@ -45,14 +45,24 @@ samples[c('abs',
           'sigma')]
 
 
-samples[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")]
+boxplot(samples[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")])
 
-pred <- apply(samples$ETpred, 1, mean)
-obs <- apply(samples$ETobs, 1, mean)
 
-#ETpred <- predictET(df, samples)
 
-plotObsPred(obs, pred, nbin = 15, ptcol = as.numeric(as.factor(as.character(df$Site))))
+
+
+
+### out of sample
+Dk3 <- ameriLST[Site=='Dk3']
+
+pred <- apply(predictET(Dk3, samples), 2, mean)
+obs <- Dk3$ET
+
+plotObsPred(obs, pred, nbin = 15)
 abline(0,1,col='red')
 lm(pred~obs-1)
 print(cor(obs, pred))
+
+Dk3[,plot(Year+DOY/365, ET, type = 'l', lty=2)]
+Dk3[,lines(Year+DOY/365, pred, col='darkgreen', lwd=2)]
+

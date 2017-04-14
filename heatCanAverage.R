@@ -9,7 +9,7 @@ df[,SitesID:=as.numeric(as.factor(as.character(Site)))]
 dim(df)
 
 dfSites <- df$SitesID
-
+dfSites <- rep(1, length(dfSites))
 ns <- length(unique(dfSites))
 
 jags <- jags.model('heatCanSites.bugs',
@@ -52,7 +52,7 @@ obs <- apply(samples$ETobs, 1, mean)
 
 #ETpred <- predictET(df, samples)
 
-plotObsPred(obs, pred, nbin = 15, ptcol = as.numeric(as.factor(as.character(df$Site))))
+plotObsPred(obs, pred, nbin = 15)
 abline(0,1,col='red')
 lm(pred~obs-1)
 print(cor(obs, pred))
