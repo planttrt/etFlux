@@ -12,7 +12,7 @@ dfSites <- df$SitesID
 dfSites <- rep(1, length(dfSites))
 ns <- length(unique(dfSites))
 
-jags <- jags.model('heatCanSites.bugs',
+jagsOut <- jags.model('heatCanSites.bugs',
                    data = list('Si' = df$RS,
                                'Tair' = df$TA,
                                'Tsur' = df$LST,
@@ -24,8 +24,8 @@ jags <- jags.model('heatCanSites.bugs',
                    n.chains = 1,
                    quiet = T)
 
-update(jags, 1000)
-samples <- jags.samples(jags,n.iter = 1000,
+update(jagsOut, 1000)
+samplesOut <- jags.samples(jagsOut,n.iter = 1000,
                         c('abs',
                           'eSur',
                           'eSky',
@@ -36,8 +36,8 @@ samples <- jags.samples(jags,n.iter = 1000,
                           'ETobs',
                           'Snet','THi','THo','H','LE'))
 
-print(signif(sapply(samples, mean),2))
-samples[c('abs',
+print(signif(sapply(samplesOut, mean),2))
+samplesOut[c('abs',
           'eSur',
           'eSky',
           'Cconv',
@@ -45,7 +45,7 @@ samples[c('abs',
           'sigma')]
 
 
-boxplot(samples[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")])
+boxplot(samplesOut[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")])
 
 
 
@@ -55,14 +55,23 @@ boxplot(samples[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")])
 ### out of sample
 Dk3 <- ameriLST[Site=='Dk3']
 
-pred <- apply(predictET(Dk3, samples), 2, mean)
+pred <- apply(predictET(Dk3, samplesOut), 2, mean)
 obs <- Dk3$ET
 
-plotObsPred(obs, pred, nbin = 15)
-abline(0,1,col='red')
-lm(pred~obs-1)
-print(cor(obs, pred))
 
 Dk3[,plot(Year+DOY/365, ET, type = 'l', lty=2)]
 Dk3[,lines(Year+DOY/365, pred, col='darkgreen', lwd=2)]
 
+
+
+
+plotObsPred(obs, pred, breaks = 0:16, 
+            xlab = 'Observed ET (mm/day)',
+            ylab = 'Predicted ET (mm/day)',
+            ylim = c(0,16), xlim=c(0,16))
+mtext('out-of-sample (Duke pine forest)', font = 2, cex=1.7, line = 1)
+abline(0,1,col='red')
+mtext(paste0('R²=',signif(cor(obs, pred)^2,2)),
+      adj = 0.1, line = -2, font=2, cex=1.7)
+
+lm(pred~obs-1)
