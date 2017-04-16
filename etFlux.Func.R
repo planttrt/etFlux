@@ -15,7 +15,7 @@ simulateET <- function(df, abs, eSky, eSur, Cconv, Aconv, sigma){
   ET
 }
 
-predictET <- function(df, samples=NULL, noWindData = F){
+predictET <- function(df, samples=NULL, useWindData = T){
   Sigma <- 5.670367 * 10^-8
   
   abs <- t(apply(samples$abs, 1:2, mean))
@@ -23,7 +23,7 @@ predictET <- function(df, samples=NULL, noWindData = F){
   eSur <- t(apply(samples$eSur, 1:2, mean))
   sigma <- t(apply(samples$sigma, 1:2, mean))
   
-  if(noWindData){
+  if(!useWindData){
     Hconv <- t(apply(samples$Hconv, 1:2, mean))
   }else{
     Cconv <- t(apply(samples$Cconv, 1:2, mean))
@@ -33,7 +33,7 @@ predictET <- function(df, samples=NULL, noWindData = F){
   Snet <- abs %*% df$RS
   THi <- Sigma*eSky %*% (df$TA + 273.15)^4
   THo <- - Sigma * eSur %*% (df$LST + 273.15)^4
-  if(noWindData) {
+  if(!useWindData) {
     H <- - Hconv%*%(df$LST - df$TA)
   }else{
     H <- - sweep(sweep( exp(Aconv%*%log(df$WS)), 1, c(Cconv), '*'), 2, (df$LST - df$TA),'*')
@@ -52,10 +52,10 @@ etFlux.Model <- function(ameriLST,
                          ngibbs = 1000,
                          n.chains = 1,
                          quiet = F,
-                         noWindData = T,
+                         useWindData = T,
                          perSite = T,
                          SitesList){
-  bugsCode <- switch(noWindData+1, 'etFlux.bugs', 'etFluxNoWind.bugs')
+  bugsCode <- switch(useWindData+1, 'etFluxNoWind.bugs', 'etFlux.bugs')
   
   df <- ameriLST[Site%in%SitesList]
   SitesList <- unique(df$Site)
@@ -65,7 +65,7 @@ etFlux.Model <- function(ameriLST,
   if(!perSite) dfSites <- rep(1, length(dfSites))
   ns <- length(unique(dfSites))
   
-  if(noWindData){
+  if(!useWindData){
     bugsCode <- 'etFluxNoWind.bugs'
     dataList <- list('Si' = df$RS,
                      'Tair' = df$TA,
@@ -109,7 +109,7 @@ etFlux.Model <- function(ameriLST,
   update(jags, nburnin)
   
   samples <- jags.samples(jags, n.iter = ngibbs, variable.names = variableNames)
-  if(noWindData)SitesList <- 'general'
+  if(!useWindData)SitesList <- 'general'
   
   output <- list(samples = samples, sitesList = SitesList)
   output$DT <- JagsOutput2list(output)
