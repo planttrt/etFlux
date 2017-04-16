@@ -80,3 +80,77 @@ boxplot(data.frame(ChR=-samples$THo[1,,],
         outline = F)
 mtext('Outgoing thermal (W/m2)', font=2, cex=1.5)
 
+
+
+
+boxplot(samplesOut[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")])
+
+
+
+
+
+
+### out of sample
+Dk3 <- ameriLST[Site=='Dk3']
+
+pred <- apply(predictET(Dk3, samplesOut), 2, mean)
+obs <- Dk3$ET
+
+
+Dk3[,plot(Year+DOY/365, ET, type = 'l', lty=2)]
+Dk3[,lines(Year+DOY/365, pred, col='darkgreen', lwd=2)]
+
+
+
+
+plotObsPred(obs, pred, breaks = 0:16, 
+            xlab = 'Observed ET (mm/day)',
+            ylab = 'Predicted ET (mm/day)',
+            ylim = c(0,16), xlim=c(0,16))
+mtext('out-of-sample (Duke pine forest)', font = 2, cex=1.7, line = 1)
+abline(0,1,col='red')
+mtext(paste0('R²=',signif(cor(obs, pred)^2,2)),
+      adj = 0.1, line = -2, font=2, cex=1.7)
+
+lm(pred~obs-1)
+
+
+samples[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")]
+
+pred <- apply(samples$ETpred, 1, mean)
+obs <- apply(samples$ETobs, 1, mean)
+
+#ETpred <- predictET(df, samples)
+
+plotObsPred(obs, pred, breaks = 0:16, 
+            xlab = 'Observed ET (mm/day)',
+            ylab = 'Predicted ET (mm/day)',
+            ylim = c(0,16), xlim=c(0,16))
+mtext('in-sample predicitons for all sites', font = 2, cex=1.7, line = 1)
+abline(0,1,col='red')
+mtext(paste0('R²=',signif(cor(obs, pred)^2,2)),
+      adj = 0.1, line = -2, font=2, cex=1.7)
+
+lm(pred~obs-1)
+
+
+print(signif(sapply(samples, mean),2))
+samples[c('abs',
+          'eSur',
+          'eSky',
+          'Cconv',
+          'Aconv',
+          'sigma')]
+
+
+samples[c("Aconv","Cconv", "abs", "eSky","eSur","sigma")]
+
+pred <- apply(samples$ETpred, 1, mean)
+obs <- apply(samples$ETobs, 1, mean)
+
+#ETpred <- predictET(df, samples)
+
+plotObsPred(obs, pred, nbin = 15)
+abline(0,1,col='red')
+lm(pred~obs-1)
+print(cor(obs, pred))

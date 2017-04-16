@@ -4,7 +4,7 @@ model{
     Snet[i] <- abs[Sites[i]] * Si[i]
     THi[i] <- eSky[Sites[i]] * Sigma * (Tair[i] + 273.15)^4
     THo[i] <- -eSur[Sites[i]] * Sigma * (Tsur[i] + 273.15)^4
-    H[i] <- -Cconv[Sites[i]] * WS[i]^Aconv[Sites[i]] * (Tsur[i] - Tair[i])
+    H[i] <- -Hconv[Sites[i]] * (Tsur[i] - Tair[i])
     LE[i] <- -(Snet[i] + THi[i] + THo[i] + H[i])
     Lambda[i] <- 2502 - 2.308*Tair[i]
     
@@ -20,8 +20,7 @@ model{
     
     eSky[s] ~ dunif(0.65, .85)
     eSur[s] ~ dunif(0.94, .99)
-    Cconv[s] ~ dnorm(0, .0001)T(0,)
-    Aconv[s] ~ dunif(0.5, .8)
+    Hconv[s] ~ dnorm(0, .0001)T(0,)
     
     invvar[s]   ~ dgamma(0.1, 0.1)
     sigma[s] <- 1/sqrt(invvar[s])

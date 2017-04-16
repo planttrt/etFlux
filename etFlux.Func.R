@@ -1,4 +1,7 @@
+library(data.table)
 library(truncnorm)
+library(rjags)
+
 simulateET <- function(df, abs, eSky, eSur, Cconv, Aconv, sigma){
   Sigma <- 5.670367 * 10^-8
   Snet <- abs * df$SOL
@@ -11,30 +14,30 @@ simulateET <- function(df, abs, eSky, eSur, Cconv, Aconv, sigma){
   ET <- rtruncnorm(n = length(mu), a = 0, sd = sigma, mean = mu)
   ET
 }
-predictET <- function(df, 
-                      samples=NULL,
-                      abs, eSky, eSur, Cconv, Aconv, sigma){
+
+predictET <- function(df, samples=NULL, noWindData = F){
   Sigma <- 5.670367 * 10^-8
-  if(!is.null(samples)) {
-    abs <- samples$abs
-    eSky <- samples$eSky
-    eSur <- samples$eSur
-    Cconv <- samples$Cconv
-    Aconv <- samples$Aconv
-    sigma <- samples$sigma
-    
+  
+  abs <- t(apply(samples$abs, 1:2, mean))
+  eSky <- t(apply(samples$eSky, 1:2, mean))
+  eSur <- t(apply(samples$eSur, 1:2, mean))
+  sigma <- t(apply(samples$sigma, 1:2, mean))
+  
+  if(noWindData){
+    Hconv <- t(apply(samples$Hconv, 1:2, mean))
+  }else{
+    Cconv <- t(apply(samples$Cconv, 1:2, mean))
+    Aconv <- t(apply(samples$Aconv, 1:2, mean))
   }
-  abs <- t(apply(abs, 1:2, mean))
-  eSky <- t(apply(eSky, 1:2, mean))
-  eSur <- t(apply(eSur, 1:2, mean))
-  Cconv <- t(apply(Cconv, 1:2, mean))
-  Aconv <- t(apply(Aconv, 1:2, mean))
-  sigma <- t(apply(sigma, 1:2, mean))
-    
+  
   Snet <- abs %*% df$RS
   THi <- Sigma*eSky %*% (df$TA + 273.15)^4
   THo <- - Sigma * eSur %*% (df$LST + 273.15)^4
-  H <- - sweep(sweep( exp(Aconv%*%log(df$WS)), 1, c(Cconv), '*'), 2, (df$LST - df$TA),'*')
+  if(noWindData) {
+    H <- - Hconv%*%(df$LST - df$TA)
+  }else{
+    H <- - sweep(sweep( exp(Aconv%*%log(df$WS)), 1, c(Cconv), '*'), 2, (df$LST - df$TA),'*')
+  }
   LE <- -(Snet + THi + THo + H)
   Lambda <- 2502 - 2.308*df$TA
   mu <- sweep(-LE, 2, c(Lambda), '/')*24*3.6
@@ -43,3 +46,96 @@ predictET <- function(df,
 }
 
 
+
+etFlux.Model <- function(ameriLST, 
+                         nburnin = 1000,
+                         ngibbs = 1000,
+                         n.chains = 1,
+                         quiet = F,
+                         noWindData = T,
+                         perSite = T,
+                         SitesList){
+  bugsCode <- switch(noWindData+1, 'etFlux.bugs', 'etFluxNoWind.bugs')
+  
+  df <- ameriLST[Site%in%SitesList]
+  SitesList <- unique(df$Site)
+  df[,SitesID:=as.numeric(as.factor(as.character(Site)))]
+  
+  dfSites <- df$SitesID
+  if(!perSite) dfSites <- rep(1, length(dfSites))
+  ns <- length(unique(dfSites))
+  
+  if(noWindData){
+    bugsCode <- 'etFluxNoWind.bugs'
+    dataList <- list('Si' = df$RS,
+                     'Tair' = df$TA,
+                     'Tsur' = df$LST,
+                     # 'WS' = df$WS,
+                     'ET' = df$ET,
+                     'Sites' = dfSites,
+                     'ns' = ns,
+                     'n' = nrow(df))
+    variableNames <- c('abs',
+                       'eSur', 'eSky',
+                       'Hconv',
+                       'sigma',
+                       'ETpred', 'ETobs',
+                       'Snet','THi','THo','H','LE')
+    
+  }else{
+    bugsCode <- 'etFlux.bugs'
+    dataList <- list('Si' = df$RS,
+                     'Tair' = df$TA,
+                     'Tsur' = df$LST,
+                     'WS' = df$WS,
+                     'ET' = df$ET,
+                     'Sites' = dfSites,
+                     'ns' = ns,
+                     'n' = nrow(df))
+    
+    variableNames <- c('abs',
+                       'eSur', 'eSky',
+                       'Cconv', 'Aconv',
+                       'sigma',
+                       'ETpred', 'ETobs',
+                       'Snet','THi','THo','H','LE')
+  }
+  
+  jags <- jags.model(bugsCode,
+                     data = dataList,
+                     n.chains = n.chains,
+                     quiet = quiet)
+  
+  update(jags, nburnin)
+  
+  samples <- jags.samples(jags, n.iter = ngibbs, variable.names = variableNames)
+  if(noWindData)SitesList <- 'general'
+  
+  output <- list(samples = samples, sitesList = SitesList)
+  output$DT <- JagsOutput2list(output)
+  output
+}
+
+
+JagsOutput2list <- function(output){
+  DT <- list()
+  nameList <- names(output$samples)
+  for(i in 1:length(nameList)){
+    mc <- output$samples[[nameList[i]]]
+    if(dim(mc)[3]>1){
+      mc <- t(apply(mc, 1:2, mean))
+    }else{
+      dim(mc) <- dim(mc)[-3]
+      mc <- apply(t(mc), 1:2, function(x)x)
+    }
+    
+    if(ncol(mc)==length(output$sitesList)){
+      mc <- as.data.table(mc)
+      colnames(mc) <- output$sitesList
+    }else{
+      mc <- as.data.table(t(apply(mc, 2, quantile, probs=c(.5, .025, .975))))
+    }
+    DT[[nameList[i]]] <- mc
+  }
+  DT
+}

@@ -1,12 +1,16 @@
+library(data.table)
+
+source('data/etFlux.LoadAmeriData.R')
+source('data/etFlux.LoadLSTData.R')
+
+sites <- as.data.table(read.csv('data/sites.csv'))
+sites$Code <- gsub('US-','',sites$Code)
+
+
 etFlux.LoadData <- function(){
   
-  sites <- as.data.table(read.csv('data/sites.csv'))
-  sites$Code <- gsub('US-','',sites$Code)
-  
-  source('etFlux.LoadAmeriData.R')
   ameri <- etFlux.LoadAmeriData()
   
-  source('etFlux.LoadLSTData.R')
   LST <- etFlux.LoadLSTData()
   
   
