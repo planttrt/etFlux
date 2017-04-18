@@ -51,7 +51,7 @@ etFlux.Model <- function(ameriLST,
                          nburnin = 1000,
                          ngibbs = 1000,
                          n.chains = 1,
-                         quiet = T,
+                         quiet = F,
                          useWindData = T,
                          perSite = T,
                          SitesList){

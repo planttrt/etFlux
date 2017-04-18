@@ -2,31 +2,50 @@ source('etFlux.Func.R')
 
 source('etFlux.LoadData.R')
 
-ameriLST <- etFlux.LoadData()
+# ameri <- etFlux.LoadAmeriData()
+load('ameri.RData')
+LST <- etFlux.LoadLSTData()
 
+ameriLST <- etFlux.LoadData(ameri, LST)
+
+# sitesList <- c('ChR', 'Dk2', 'Dk3', 'NC2')
+sitesList <- c('ChR',  'Dk2',  'Dk3',  'NC2',  'Me2', 'Me5',  'Me6',  'MRf', 'Ho3','LPH','GMF','Blo')
+
+table(ameriLST[,Site])
 genModel <- etFlux.Model(ameriLST, 
                          useWindData = F,
                          perSite = F,
-                         SitesList = c('ChR', 'Dk2', 'Dk3', 'NC2'))
+                         SitesList = sitesList)
+genModel$DT <- JagsOutput2list(genModel)
 
 genModel.Wind <- etFlux.Model(ameriLST, 
                               useWindData = T,
                               perSite = F,
-                              SitesList = c('ChR', 'Dk2', 'Dk3', 'NC2'))
+                              SitesList = sitesList)
+genModel.Wind$DT <- JagsOutput2list(genModel.Wind)
 
-fourSitesModel <- etFlux.Model(ameriLST, 
+perSiteModel <- etFlux.Model(ameriLST, 
                                useWindData = F,
                                perSite = T,
-                               SitesList = c('ChR', 'Dk2', 'Dk3', 'NC2'))
+                               SitesList = sitesList)
+perSiteModel$DT <- JagsOutput2list(perSiteModel)
 
-fourSitesModel.Wind <- etFlux.Model(ameriLST,
+perSiteModel.Wind <- etFlux.Model(ameriLST,
                                     useWindData = T, 
                                     perSite = T,
-                                    SitesList = c('ChR', 'Dk2', 'Dk3', 'NC2'))
+                                    SitesList = sitesList)
+perSiteModel.Wind$DT <- JagsOutput2list(perSiteModel.Wind)
 
-genModel.Wind.DukeOut <- etFlux.Model(ameriLST, 
-                                      useWindData = T,
+sampleOutModel <- etFlux.Model(ameriLST, 
+                                      useWindData = F,
                                       perSite = F,
                                       SitesList = c('ChR', 'Dk2', 'NC2'))
+sampleOutModel$DT <- JagsOutput2list(sampleOutModel)
 
-save.image(file='etFlux.RData')
+sampleOutModel.Wind <- etFlux.Model(ameriLST, 
+                               useWindData = T,
+                               perSite = F,
+                               SitesList = c('ChR', 'Dk2', 'NC2'))
+sampleOutModel.Wind$DT <- JagsOutput2list(sampleOutModel.Wind)
+
+# save.image(file='etFlux.RData')

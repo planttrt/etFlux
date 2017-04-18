@@ -23,6 +23,11 @@ etFlux.LoadAmeriData <- function (){
   ameriflux$Wrc <- read.csv('data/ameriflux/csv/AMF_US-Wrc_BASE_HH_8-1.csv', skip = 2)
   ameriflux$MRf <- read.csv('data/ameriflux/csv/AMF_US-MRf_BASE_HH_4-1.csv', skip = 2)
   
+  ameriflux$Ho3 <- read.csv('data/ameriflux/csv/AMF_US-Ho3_BASE_HH_2-1.csv', skip = 2)
+  ameriflux$GMF <- read.csv('data/ameriflux/csv/AMF_US-GMF_BASE_HH_2-1.csv', skip = 2)
+  ameriflux$LPH <- read.csv('data/ameriflux/csv/AMF_US-LPH_BASE_HH_1-1.csv', skip = 2)
+  ameriflux$Blo <- read.csv('data/ameriflux/csv/AMF_US-Blo_BASE_HH_3-1.csv', skip = 2)
+  
   ameriflux.NA <- lapply(ameriflux, function(x){x[x==-9999] <- NA; as.data.table(x)})
   ameriflux.NA <- lapply(ameriflux.NA, function(x){x[,.(Time=as.POSIXct(as.character(TIMESTAMP_START),format='%Y%m%d%H%M'),
                                                         TA, 
