@@ -51,7 +51,7 @@ etFlux.Model <- function(ameriLST,
                          nburnin = 1000,
                          ngibbs = 1000,
                          n.chains = 1,
-                         quiet = F,
+                         quiet = T,
                          useWindData = T,
                          perSite = T,
                          SitesList){
@@ -109,29 +109,36 @@ etFlux.Model <- function(ameriLST,
   update(jags, nburnin)
   
   samples <- jags.samples(jags, n.iter = ngibbs, variable.names = variableNames)
-  if(!useWindData)SitesList <- 'general'
+  if(!perSite)SitesList <- 'general'
   
-  output <- list(samples = samples, sitesList = SitesList)
-  output$DT <- JagsOutput2list(output)
+  output <- list(Samples = samples, 
+                 Sites = SitesList, 
+                 Data = df, 
+                 useWindData = useWindData, 
+                 perSite = perSite)
+  # output$DT <- JagsOutput2list(output)
   output
 }
 
 
 JagsOutput2list <- function(output){
   DT <- list()
-  nameList <- names(output$samples)
+  nameList <- names(output$Samples)
   for(i in 1:length(nameList)){
-    mc <- output$samples[[nameList[i]]]
+    mc <- output$Samples[[nameList[i]]]
     if(dim(mc)[3]>1){
       mc <- t(apply(mc, 1:2, mean))
     }else{
       dim(mc) <- dim(mc)[-3]
-      mc <- apply(t(mc), 1:2, function(x)x)
+      mc <- t(apply(mc, 1:2, function(x)x))
     }
     
-    if(ncol(mc)==length(output$sitesList)){
+    if(ncol(mc)==length(output$Sites)){
       mc <- as.data.table(mc)
-      colnames(mc) <- output$sitesList
+      colnames(mc) <- output$Sites
+    }else if(ncol(mc)==1){
+      mc <- as.data.table(mc)
+      colnames(mc) <- nameList[i]
     }else{
       mc <- as.data.table(t(apply(mc, 2, quantile, probs=c(.5, .025, .975))))
     }

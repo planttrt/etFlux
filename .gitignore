@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-heatCan.RData
-tmp.R
 data/LST
 data/ameriflux
+*.RData

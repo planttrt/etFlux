@@ -3,16 +3,11 @@ library(data.table)
 source('data/etFlux.LoadAmeriData.R')
 source('data/etFlux.LoadLSTData.R')
 
-sites <- as.data.table(read.csv('data/sites.csv'))
+sites <- as.data.table(read.csv('data/LST/sitesEastWest.csv'))
 sites$Code <- gsub('US-','',sites$Code)
 
 
-etFlux.LoadData <- function(){
-  
-  ameri <- etFlux.LoadAmeriData()
-  
-  LST <- etFlux.LoadLSTData()
-  
+etFlux.LoadData <- function(ameri, LST){
   
   LST[,UniCode:=paste(Site, Year,
                       sprintf(DOY,fmt = '%03d'), 
