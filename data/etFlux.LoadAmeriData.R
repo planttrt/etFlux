@@ -14,20 +14,24 @@ etFlux.LoadAmeriData <- function (){
   ameriflux$NC1 <- read.csv('data/ameriflux/csv/AMF_US-NC1_BASE_HH_2-1.csv', skip = 2)
   ameriflux$NC2 <- read.csv('data/ameriflux/csv/AMF_US-NC2_BASE_HH_3-1.csv', skip = 2)
   
+  ameriflux$Me1 <- read.csv('data/ameriflux/csv/AMF_US-Me1_BASE_HH_2-1.csv', skip = 2)
+  ameriflux$Me2 <- read.csv('data/ameriflux/csv/AMF_US-Me2_BASE_HH_8-1.csv', skip = 2)
+  ameriflux$Me3 <- read.csv('data/ameriflux/csv/AMF_US-Me3_BASE_HH_3-1.csv', skip = 2)
+  ameriflux$Me4 <- read.csv('data/ameriflux/csv/AMF_US-Me4_BASE_HH_4-1.csv', skip = 2)
+  ameriflux$Me5 <- read.csv('data/ameriflux/csv/AMF_US-Me5_BASE_HH_2-1.csv', skip = 2)
+  ameriflux$Me6 <- read.csv('data/ameriflux/csv/AMF_US-Me6_BASE_HH_6-1.csv', skip = 2)
+  ameriflux$Wrc <- read.csv('data/ameriflux/csv/AMF_US-Wrc_BASE_HH_8-1.csv', skip = 2)
+  ameriflux$MRf <- read.csv('data/ameriflux/csv/AMF_US-MRf_BASE_HH_4-1.csv', skip = 2)
+  
   ameriflux.NA <- lapply(ameriflux, function(x){x[x==-9999] <- NA; as.data.table(x)})
   ameriflux.NA <- lapply(ameriflux.NA, function(x){x[,.(Time=as.POSIXct(as.character(TIMESTAMP_START),format='%Y%m%d%H%M'),
                                                         TA, 
                                                         RS=SW_IN, 
                                                         WS, 
                                                         ET= LE/(2502-2.308*TA)/1000*3600*24)]})
-  ameri <- rbind(data.table(ameriflux.NA$ChR, Site='ChR'),
-                 data.table(ameriflux.NA$Dk1, Site='Dk1'),
-                 data.table(ameriflux.NA$Dk2, Site='Dk2'),
-                 data.table(ameriflux.NA$Dk3, Site='Dk3'),
-                 data.table(ameriflux.NA$KS1, Site='KS1'),
-                 data.table(ameriflux.NA$KS2, Site='KS2'),
-                 data.table(ameriflux.NA$NC1, Site='NC1'),
-                 data.table(ameriflux.NA$NC2, Site='NC2'))
+  ameri <- Reduce(rbind, ameriflux.NA)
+  ameri$Site <- rep( names(ameriflux.NA), sapply(ameriflux.NA,nrow))
+  
   ameri[ET<0, ET:=0]
   ameri[RS<0, RS:=0]
   ameri[,Year:=year(Time)]
@@ -35,7 +39,5 @@ etFlux.LoadAmeriData <- function (){
   ameri[,Hour:=hour(Time)+minute(Time)/60]
   
   ameri
-  
-  
 }
 
