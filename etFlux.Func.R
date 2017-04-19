@@ -146,3 +146,63 @@ JagsOutput2list <- function(output){
   }
   DT
 }
+
+
+
+insertLegend <- function(rng, col){
+  bty <- par()$bty
+  par(bty='o')
+  image.plot(legend.only=TRUE, zlim= rng, 
+             smallplot= c(.83, .91, .2, .75),
+             axis.args = list(cex.axis = 1, font=2),
+             legend.args = list(text= 'mm/day/°C', side=3,xpd=T, adj=0, line=.7, font=2), 
+             col = col, horizontal = F, yaxt='s') 
+  par(bty=bty)
+}
+setRange <- function(r, rng=quantile(r, probs=c(.01,.99))){
+  r[r<rng[1]] <- rng[1]
+  r[r>rng[2]] <- rng[2]
+  r
+}
+rMean <- function(rList){
+  m <- rList[[1]]
+  for(i in 2:length(rList)) m <- m + rList[[i]]
+  m/length(rList)
+}
+
+sensPerMonth <- function(m=8, out, flag=1){
+  TA <- raster(sprintf('~/Box Sync/Home Folder/Private/DATA/TA/4K/NORM/TA.4K.NORM.%02d.tif', m))
+  TS <- raster(sprintf('~/Box Sync/Home Folder/Private/DATA/TS/4K/NORM/TS.4K.NORM.%02d.tif', m))
+  
+  σ <- 5.670367 * 10^-8
+  λ <- (2502 - 2.308*TA)/24/3.6
+  ϵsky <- mean(out$DT$eSky$general)
+  ϵsur <- mean(out$DT$eSur$general)
+  Hconv <- mean(out$DT$Hconv$general)
+  
+  sens <- switch(flag,
+                 -1/λ * ( 4*σ*ϵsky*(TA+273.15)^3 + 4*σ*ϵsur*TS^3 + Hconv),
+                 -1/λ * ( 4*σ*ϵsur*(TS+273.15)^3 + Hconv),
+                 1/λ * ( 4*σ*ϵsky*(TA+273.15)^3+ Hconv))
+  sens
+}
+
+
+
+getTemporalSens <- function(TA, TS, out){
+  TA <- matrix(TA, nrow = 1)
+  TS <- matrix(TS, nrow = 1)
+  σ <- 5.670367 * 10^-8
+  λ <- (2502 - 2.308*TA)/24/3.6
+  one1 <- TA/TA
+  
+  ϵsky <- matrix(out$DT$eSky$general, ncol = 1)
+  ϵsur <- matrix(out$DT$eSur$general, ncol = 1)
+  Hconv <- matrix(out$DT$Hconv$general, ncol = 1)
+  one2 <- ϵsur/ϵsur
+  
+  dDT <- (one2%*%(-1/λ)) * ( 4*σ*ϵsky%*%(TA+273.15)^3 + 4*σ*ϵsur%*%(TS^3) + Hconv%*%one1)
+  dTS <- (one2%*%(-1/λ)) * ( 4*σ*ϵsur%*%(TS^3) + Hconv%*%one1)
+  dTA <- (one2%*%(1/λ)) * ( 4*σ*ϵsky%*%(TA+273.15)^3 + Hconv%*%one1)
+  list(dDT=dDT, dTS=dTS, dTA=dTA)
+}

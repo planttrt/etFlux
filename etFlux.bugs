@@ -1,5 +1,4 @@
 model{
-
   for(i in 1:n){
     Snet[i] <- abs[Sites[i]] * Si[i]
     THi[i] <- eSky[Sites[i]] * Sigma * (Tair[i] + 273.15)^4
@@ -18,8 +17,8 @@ model{
   for(s in 1:ns){
     abs[s] ~ dunif(0,1)
     
-    eSky[s] ~ dunif(0.65, .85)
-    eSur[s] ~ dunif(0.94, .99)
+    eSky[s] ~ dunif(0.60, .89)
+    eSur[s] ~ dunif(0.90, .99)
     Cconv[s] ~ dnorm(0, .0001)T(0,)
     Aconv[s] ~ dunif(0.5, .8)
     

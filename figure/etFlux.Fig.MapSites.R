@@ -1,16 +1,17 @@
 library(maps)
 
 source('~/Projects/procVisData/dataViz.R')
-siteNames <- c('Chestnut Ridge',
-               'Duke Hardwoods',
-               'Duke Loblolly Pine',
-               'NC Loblolly Pine',
-               'General Model')
-cols <- c(rep('#707070', 4), 'black') 
+siteNames.tmp <- c('Chestnut Ridge',
+                   'Duke Forest Hardwoods',
+                   'Duke Forest Loblolly',
+                   'Loblolly Plantation',
+                   "Mary's River Fir")
 
-png('figure/etFlux.Fig.MapSites.png', width = 6, height = 4, units = 'in', res = 300)
-map('state', xlim=c(-85,-75), ylim=c(32,38))
-points(sites[Code%in%c('ChR', 'Dk2', 'NC2'),
-             .(Longitude, Latitude)], pch=19, cex=2)
-mtext('Flux sites locations', font=2, cex=2, line = 2)
+png('figure/etFlux.Fig.MapSites.png', width = 7, height = 4, units = 'in', res = 300)
+par(mar=c(0,0,0,0))
+map('state')#, xlim=c(-85,-75), ylim=c(32,38))
+pts <- sites[Code%in%c('ChR', 'Dk2', 'NC2', 'Me2'), .(Name, Code, Longitude, Latitude)]
+points(pts[,.(Longitude, Latitude)], pch=c(15,17:19),col='#f18432', cex=1)
+legend('bottomleft',legend = siteNames.tmp[-3], col = '#f18432', pch= c(15, 17:19), bty='n')
+mtext('Study sites distribution', font=2, cex=1.5, line = 0)
 dev.off()

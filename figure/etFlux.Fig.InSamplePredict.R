@@ -1,7 +1,7 @@
 source('~/Projects/procVisData/dataViz.R')
 
-obs <- fourSitesModel.Wind$DT$ETobs$`50%`
-pred <- fourSitesModel.Wind$DT$ETpred$`50%`
+obs <- perSiteModel.Wind$DT$ETobs$`50%`
+pred <- perSiteModel.Wind$DT$ETpred$`50%`
 cols <- c('#e56c5f','grey','#354358')
 png('figure/etFlux.Fig.InSamplePredict.png', width = 6, height = 6, units = 'in', res = 300)
 par(mar=c(4,4,3,2),  pty = "s")

@@ -1,7 +1,7 @@
 source('~/Projects/procVisData/dataViz.R')
 
 obs <- ameriLST[Site=='Dk3', ET]
-pred <- apply(predictET(ameriLST[Site=='Dk3'], samples = genModel.Wind.DukeOut$Samples), 2, mean)
+pred <- apply(predictET(ameriLST[Site=='Dk3'], samples = sampleOutModel.Wind$Samples), 2, mean)
 cols <- c('#e56c5f','grey','#354358')
 
 png('figure/etFlux.Fig.OutSamplePredict.png', width = 6, height = 6, units = 'in', res = 300)

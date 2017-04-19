@@ -7,8 +7,8 @@ fluxes <- c('Snet (W/m²)',
             'THo (W/m²)',
             'H (W/m²)')
 
-DT <- cbind(fourSitesModel$Data[, .(Site, Year, DOY, LST, TA, RS, ET)],
-            as.data.table(fourSitesModel$DT[c("H", "LE", "Snet", "THi", "THo")]))
+DT <- cbind(perSiteModel$Data[, .(Site, Year, DOY, LST, TA, RS, ET)],
+            as.data.table(perSiteModel$DT[c("H", "LE", "Snet", "THi", "THo")]))
 DT[, Time:=Year+DOY/365]
 DT[, table(Site)]
 
