@@ -5,7 +5,7 @@ model{
     THi[i] <- eSky[Sites[i]] * Sigma * (Tair[i] + 273.15)^4
     THo[i] <- -eSur[Sites[i]] * Sigma * (Tsur[i] + 273.15)^4
     H[i] <- -Hconv[Sites[i]] * (Tsur[i] - Tair[i])
-    LE[i] <- -(Snet[i] + THi[i] + THo[i] + H[i])
+    LE[i] <- -(Snet[i] + THi[i] + THo[i] + H[i])*CC[Sites[i]]
     Lambda[i] <- 2502 - 2.308*Tair[i]
     
     ET[i] ~ dnorm( -LE[i] / Lambda[i] *24*3.6, invvar[Sites[i]])T(0,)

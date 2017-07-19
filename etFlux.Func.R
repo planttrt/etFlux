@@ -53,6 +53,7 @@ etFlux.Model <- function(ameriLST,
                          n.chains = 1,
                          quiet = F,
                          useWindData = T,
+                         vegCover = NULL,
                          perSite = T,
                          SitesList){
   bugsCode <- switch(useWindData+1, 'etFluxNoWind.bugs', 'etFlux.bugs')
@@ -62,6 +63,8 @@ etFlux.Model <- function(ameriLST,
   df[,SitesID:=as.numeric(as.factor(as.character(Site)))]
   
   dfSites <- df$SitesID
+  if(is.null(vegCover)) vegCover <- rep(1, length(dfSites))
+  
   if(!perSite) dfSites <- rep(1, length(dfSites))
   ns <- length(unique(dfSites))
   
@@ -73,6 +76,7 @@ etFlux.Model <- function(ameriLST,
                      # 'WS' = df$WS,
                      'ET' = df$ET,
                      'Sites' = dfSites,
+                     'CC' = vegCover,
                      'ns' = ns,
                      'n' = nrow(df))
     variableNames <- c('abs',
@@ -90,6 +94,7 @@ etFlux.Model <- function(ameriLST,
                      'WS' = df$WS,
                      'ET' = df$ET,
                      'Sites' = dfSites,
+                     'CC' = vegCover,
                      'ns' = ns,
                      'n' = nrow(df))
     
@@ -171,8 +176,8 @@ rMean <- function(rList){
 }
 
 sensPerMonth <- function(m=8, out, flag=1){
-  TA <- raster(sprintf('~/Box Sync/Home Folder/Private/DATA/TA/4K/NORM/TA.4K.NORM.%02d.tif', m))
-  TS <- raster(sprintf('~/Box Sync/Home Folder/Private/DATA/TS/4K/NORM/TS.4K.NORM.%02d.tif', m))
+  TA <- raster(sprintf('/Volumes/Data1TB/bijan/Box Sync/Home Folder/Private/TA/4K/NORM/TA.4K.NORM.%02d.tif', m))
+  TS <- raster(sprintf('/Volumes/Data1TB/bijan/Box Sync/Home Folder/Private/TS/4K/NORM/TS.4K.NORM.%02d.tif', m))
   
   σ <- 5.670367 * 10^-8
   λ <- (2502 - 2.308*TA)/24/3.6
