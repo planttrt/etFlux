@@ -2,7 +2,7 @@ library(fields)
 library(raster)
 source('etFlux.Func.R')
 source('~/Projects/procVisData/colorSet.R')
-physio <- shapefile('~/Projects/traitsModel/data/maps/physioProvinceLatLon/physioProvinceLatLon.shp')
+physio <- shapefile('data/physioProvinceLatLon/physioProvinceLatLon.shp')
 
 out <- genModel
 
@@ -24,7 +24,7 @@ r2 <- setRange(rMean(dET_dTS))
 
 col <- colorRampPalette(colList.Contad)(100)
 
-png('figure/etFlux.Fig.DT.SensMaps.png', width = 6, height = 8, res = 300,  units = 'in')
+png('figure/etFlux.Fig.DT.SensMaps.png', width = 7, height = 7.5, res = 300,  units = 'in')
 par(mar=c(1,1,1,1), mfrow=c(2,1), oma=c(2,2,2,1), bty='n')
 plot(r1, col = col, legend = F, xaxt='n')
 map('usa', add = T)
@@ -32,11 +32,23 @@ plot(physio, add=T)
 mtext('(a) Sensitivity to ∆T, Jul-Aug-Sept', font=2, line = 0, cex=1)
 insertLegend(quantile(r1, probs=c(.01,.99)), col)
 
-plot(r2, col = col, legend = F, xaxt='n')
+Arrows(-65.5, 38, -65.5, 44.5, xpd=T, lwd=2)
+Arrows(-65.5, 33, -65.5, 26.5, xpd=T, lwd=2)
+
+mtext('Low', side = 2, line = -26.5, at = 41.5, font=2)
+mtext('High', side = 2, line = -26.5, at = 30, font=2)
+
+plot(r2, col = col, legend = F, xaxt='s')
 map('usa', add = T)
 plot(physio, add=T)
 mtext('(b) Sensitivity to surface temperature, Jul-Aug-Sept', font=2, line = 0, cex=1)
 insertLegend(quantile(r2, probs=c(.01,.99)), col)
+
+Arrows(-65.5, 38, -65.5, 44.5, xpd=T, lwd=2)
+Arrows(-65.5, 33, -65.5, 26.5, xpd=T, lwd=2)
+
+mtext('Low', side = 2, line = -26.5, at = 41.5, font=2)
+mtext('High', side = 2, line = -26.5, at = 30, font=2)
 
 # plot(r3, col = col, legend = F)
 # map('usa', add = T)

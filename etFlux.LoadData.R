@@ -7,7 +7,7 @@ sites <- as.data.table(read.csv('data/LST/sitesEastWest.csv'))
 sites$Code <- gsub('US-','',sites$Code)
 
 
-etFlux.LoadData <- function(ameri, LST){
+etFlux.MergeData <- function(ameri, LST){
   
   LST[,UniCode:=paste(Site, Year,
                       sprintf(DOY,fmt = '%03d'), 

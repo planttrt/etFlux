@@ -30,28 +30,19 @@ cols <- c('#023442','#114756','#11475680',
 
 png('figure/etFlux.Fig.DT.SensTime.png', res = 300, 
     height = 6, width = 6, units = 'in')
-par(mfrow=c(2,2), mar=c(0,0,0,0), oma=c(4,4,1,1))
+par(mfrow=c(2,2), mar=c(0,0,0,0), oma=c(4,4,1,1), xaxt='n', yaxt='n')
 
-plot(NA, xlim=c(1,365), ylim=c(-1.3,-.85), xlab='', ylab='', xaxt='n')
-mtext("(a) Chestnut Ridge (ChR)", adj = .1, font = 2, line = -1.5)
-addSensPlots('ChR', cols = cols)
+for(i in 1:length(sitesList)){
+  plot(NA, xlim=c(1,365), ylim=c(-1.35,-.86), xlab='', ylab='', xaxt='n')
+  mtext(paste0('(',letters[i], ') ', siteNames[i], '(',sitesList[i], ')'), adj = 0.05, line = -1.5, font=2, cex=1)
+  addSensPlots(sitesList[i], cols = cols)
+  if(i%in%c(3,4)) axis(1, xaxt='s', font=2)
+  if(i%in%c(1,3)) axis(2, yaxt='s', font=2)
+  
+}
+mtext('Day of year', side = 1, line = 2.5, cex = 1.3,  font=2, outer = T)
+mtext('Sensitivty (mm/day/°C)', side = 2, line = 2.5,  cex = 1.3, font=2, outer = T)
 
-plot(NA, xlim=c(1,365), ylim=c(-1.3,-.85), xlab='', ylab='', xaxt='n', yaxt='n')
-mtext("(b) Duke Hardwoods (Dk2)", adj = .1, font = 2, line = -1.5)
-addSensPlots('Dk2', cols = cols)
-
-plot(NA, xlim=c(1,365), ylim=c(-1.3,-.85), xlab='', ylab='')
-mtext("(c) Mary's River Fir (MRf)", adj = .1, font = 2, line = -1.5)
-addSensPlots('MRf', cols = cols)
-
-plot(NA, xlim=c(1,365), ylim=c(-1.3,-.85), xlab='', ylab='', yaxt='n')
-mtext("(d) Loblolly Plantation (NC2)", adj = .1, font = 2, line = -1.5)
-addSensPlots('NC2', cols = cols)
-
-mtext('Day of year', font=2, side = 1, line = 2.5, cex = 1.5, outer = T)
-mtext('Sensitivity of ET (mm/day/°C)', font=2, side = 2, 
-      line = 2.5, cex = 1.5, outer = T)
-
-legend(legend = c('w.r.t. TS', 'w.r.t. ∆T'), fill = cols[c(2,5)],
+legend(legend = c('w.r.t. S', 'w.r.t. ∆T'), fill = cols[c(5,2)],
        'bottom', bty='n', cex=1.4, horiz = T, text.font = 2)
 dev.off()
