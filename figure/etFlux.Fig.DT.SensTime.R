@@ -9,6 +9,7 @@ site <- 'ChR'
 
 addSensPlots <- function(site, cols=c('#000000', '#808080', '#80808080',
                                       '#000000', '#808080', '#80808080')){
+  plot(NA, xlim=c(1,365), ylim=c(-1.35,-.86), xlab='', ylab='', xaxt='n')
   annualMean <- ameriLST[Site==site, .(TA=mean(TA, na.rm=T), TS=mean(LST, na.rm=T)), DOY]
   TA <- annualMean[order(DOY), TA]
   TS <- annualMean[order(DOY), TS]
@@ -16,11 +17,13 @@ addSensPlots <- function(site, cols=c('#000000', '#808080', '#80808080',
   
   tempSens <- getTemporalSens(TA, TS, out)
   tempSens <- lapply(tempSens, function(x)(t(apply(x, 2, quantile, probs = c(0.025, .5, .975), na.rm=T))))
+  plg <- data.frame(x=c(DOY, rev(DOY)), y1=c(tempSens$dDT[,1], rev(tempSens$dDT[,3])), y2= c(tempSens$dTS[,1], rev(tempSens$dTS[,3])))
+  plg <- na.omit(plg)
   
-  polygon(c(DOY, rev(DOY)), c(tempSens$dDT[,1], rev(tempSens$dDT[,3])),border = cols[2], col = cols[3])
+  polygon(plg$x, plg$y1, border = cols[2], col = cols[3])
   lines(DOY, tempSens$dDT[,2], lwd=2, col=cols[1])
   
-  polygon(c(DOY, rev(DOY)), c(tempSens$dTS[,1], rev(tempSens$dTS[,3])),border = cols[5], col = cols[6])
+  polygon(plg$x, plg$y2 ,border = cols[5], col = cols[6])
   lines(DOY, tempSens$dTS[,2], lwd=2, col=cols[4])
 }
 
@@ -33,9 +36,9 @@ png('figure/etFlux.Fig.DT.SensTime.png', res = 300,
 par(mfrow=c(2,2), mar=c(0,0,0,0), oma=c(4,4,1,1), xaxt='n', yaxt='n')
 
 for(i in 1:length(sitesList)){
-  plot(NA, xlim=c(1,365), ylim=c(-1.35,-.86), xlab='', ylab='', xaxt='n')
-  mtext(paste0('(',letters[i], ') ', siteNames[i], '(',sitesList[i], ')'), adj = 0.05, line = -1.5, font=2, cex=1)
   addSensPlots(sitesList[i], cols = cols)
+  mtext(paste0('(',letters[i], ') ', siteNames[i], ' (',sitesList[i], ')'), adj = 0.05, line = -1.5, font=2, cex=1)
+  
   if(i%in%c(3,4)) axis(1, xaxt='s', font=2)
   if(i%in%c(1,3)) axis(2, yaxt='s', font=2)
   

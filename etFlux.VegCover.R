@@ -44,6 +44,6 @@ genModel <- etFlux.Model(ameriLST,
                          sitesList = sitesList)
 genModel$DT <- JagsOutput2list(genModel)
 
-save(list = c('outNoWind', 'outWind', 'perSiteModel'), file = 'out1-4.RData')
+save(list = c('outNoWind', 'outWind', 'perSiteModel', 'genModel'), file = 'out.RData')
 
 
