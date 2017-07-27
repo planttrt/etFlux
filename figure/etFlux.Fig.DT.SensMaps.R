@@ -1,3 +1,4 @@
+library(shape)
 library(fields)
 library(raster)
 source('etFlux.Func.R')

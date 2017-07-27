@@ -5,7 +5,7 @@ ndvi <- raster('data/ndvi/MOD13A2_M_NDVI_2015-07-01_rgb_3600x1800.FLOAT.TIFF')
 
 lc <- raster('data/lc.tif')
 
-r <- sapply(dir('/Volumes/1TB-STORE/Box Sync/Home Folder/Private/DT/4K/NORM//', recursive = T, full.names = T), raster)
+r <- sapply(dir('~/Box Sync/Home Folder/Private/DATA/DT/4K/NORM//', recursive = T, full.names = T), raster)
 r <- rMean(r[6:9])
 ndvi <- resample(ndvi, r)
 lc <- resample(lc, r, method='ngb')

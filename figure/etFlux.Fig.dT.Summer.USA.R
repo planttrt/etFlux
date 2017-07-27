@@ -1,6 +1,6 @@
 physio <- shapefile('data/physioProvinceLatLon/physioProvinceLatLon.shp')
 # source('transAuxFuncs.R')
-r <- sapply(dir('/Volumes/1TB-STORE//Box Sync/Home Folder/Private/DT/4K/NORM//', recursive = T, full.names = T), raster)
+r <- sapply(dir('~/Box Sync/Home Folder/Private/DATA/DT/4K/NORM//', recursive = T, full.names = T), raster)
 rng <- c(5,20)
 # colList <- rev(colList.FunAndTropical)
 # colList <- colList.Ideas4Homes

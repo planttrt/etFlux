@@ -8,7 +8,7 @@ simulateET <- function(df, abs, eSky, eSur, Cconv, Aconv, sigma, CC=1){
   THi <- Sigma*eSky * (df$TA + 273.15)^4
   THo <- - Sigma * eSur * (df$LST + 273.15)^4
   H <- -(Cconv * df$WS^Aconv) * (df$LST - df$TA)
-  LE <- -(Snet + THi + THo + H)*CC
+  LE <- -((Snet + THi + THo)/CC + H)
   Lambda <- 2502 - 2.308*df$TA
   mu <- -LE*24*3.6/Lambda
   ET <- rtruncnorm(n = length(mu), a = 0, sd = sigma, mean = mu)
@@ -40,7 +40,7 @@ predictET <- function(df, samples=NULL, useWindData = T, CC = rep(1, nrow(df))){
   }else{
     H <- - sweep(sweep( exp(Aconv%*%log(df$WS)), 1, c(Cconv), '*'), 2, (df$LST - df$TA),'*')
   }
-  LE <- -(Snet + THi + THo + H)
+  LE <- -((Snet + THi + THo)/CC + H)
   Lambda <- 2502 - 2.308*df$TA
   mu <- sweep(-LE, 2, c(Lambda), '/')*24*3.6
   ET <- apply(mu, 2, rtruncnorm, n=length(sigma), a = 0, b = Inf, sd = (sigma))
@@ -50,15 +50,15 @@ predictET <- function(df, samples=NULL, useWindData = T, CC = rep(1, nrow(df))){
 
 
 etFlux.Model <- function(ameriLST, 
-                         nburnin = 1000,
-                         ngibbs = 1000,
+                         nburnin = 500,
+                         ngibbs = 500,
                          n.chains = 1,
                          quiet = F,
                          useWindData = T,
                          CC = NULL,
                          perSite = T,
                          sitesList){
-  bugsCode <- switch(useWindData+1, 'etFluxNoWind.bugs', 'etFlux.bugs')
+  bugsCode <- switch(useWindData+1, 'etFluxNoWind.bugs', 'etFluxWind.bugs')
   
   df <- ameriLST[Site%in%sitesList]
   sitesList <- unique(df$Site)
@@ -89,7 +89,7 @@ etFlux.Model <- function(ameriLST,
                        'Snet','THi','THo','H','LE')
     
   }else{
-    bugsCode <- 'etFlux.bugs'
+    bugsCode <- 'etFluxWind.bugs'
     dataList <- list('Si' = df$RS,
                      'Tair' = df$TA,
                      'Tsur' = df$LST,
@@ -178,8 +178,8 @@ rMean <- function(rList){
 }
 
 sensPerMonth <- function(m=8, out, flag=1){
-  TA <- raster(sprintf('/Volumes/1TB-STORE/Box Sync/Home Folder/Private/TA/4K/NORM/TA.4K.NORM.%02d.tif', m))
-  TS <- raster(sprintf('/Volumes/1TB-STORE/Box Sync/Home Folder/Private/TS/4K/NORM/TS.4K.NORM.%02d.tif', m))
+  TA <- raster(sprintf('~/Box Sync/Home Folder/Private/DATA/TA/4K/NORM/TA.4K.NORM.%02d.tif', m))
+  TS <- raster(sprintf('~/Box Sync/Home Folder/Private/DATA/TS/4K/NORM/TS.4K.NORM.%02d.tif', m))
   
   σ <- 5.670367 * 10^-8
   λ <- (2502 - 2.308*TA)/24/3.6

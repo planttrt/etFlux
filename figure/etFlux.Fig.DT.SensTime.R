@@ -9,7 +9,7 @@ site <- 'ChR'
 
 addSensPlots <- function(site, cols=c('#000000', '#808080', '#80808080',
                                       '#000000', '#808080', '#80808080')){
-  plot(NA, xlim=c(1,365), ylim=c(-1.35,-.86), xlab='', ylab='', xaxt='n')
+  plot(NA, xlim=c(1,365), ylim=c(-1.3,-.75), xlab='', ylab='', xaxt='n')
   annualMean <- ameriLST[Site==site, .(TA=mean(TA, na.rm=T), TS=mean(LST, na.rm=T)), DOY]
   TA <- annualMean[order(DOY), TA]
   TS <- annualMean[order(DOY), TS]
@@ -32,20 +32,27 @@ cols <- c('#023442','#114756','#11475680',
          '#6A0E00', '#8A2717', '#8A271780')
 
 png('figure/etFlux.Fig.DT.SensTime.png', res = 300, 
-    height = 6, width = 6, units = 'in')
-par(mfrow=c(2,2), mar=c(0,0,0,0), oma=c(4,4,1,1), xaxt='n', yaxt='n')
+    height = 5, width = 8, units = 'in')
+par(mfrow=c(2,3), mar=c(0,0,0,0), oma=c(4,4,1,1), xaxt='n', yaxt='n')
 
 for(i in 1:length(sitesList)){
+  if(i==3)
+  {
+    plot(1, type="n", axes=F, xlab="", ylab="")
+    legend(legend = c('w.r.t. S', 'w.r.t. ∆T'),
+           fill = cols[c(5,2)],
+               'center', bty='n', cex=3, horiz = F, text.font = 2)
+    
+    }
   addSensPlots(sitesList[i], cols = cols)
-  mtext(paste0('(',letters[i], ') ', siteNames[i], ' (',sitesList[i], ')'), adj = 0.05, line = -1.5, font=2, cex=1)
+  mtext(paste0('(',letters[i], ') ', siteNames[i], ' (',sitesList[i], ')'), adj = .1,
+        line = -2, font=2, cex=1)
   
-  if(i%in%c(3,4)) axis(1, xaxt='s', font=2)
+  if(i%in%c(3,4,5)) axis(1, xaxt='s', font=2)
   if(i%in%c(1,3)) axis(2, yaxt='s', font=2)
   
 }
 mtext('Day of year', side = 1, line = 2.5, cex = 1.3,  font=2, outer = T)
 mtext('Sensitivty (mm/day/°C)', side = 2, line = 2.5,  cex = 1.3, font=2, outer = T)
 
-legend(legend = c('w.r.t. S', 'w.r.t. ∆T'), fill = cols[c(5,2)],
-       'bottom', bty='n', cex=1.4, horiz = T, text.font = 2)
 dev.off()
