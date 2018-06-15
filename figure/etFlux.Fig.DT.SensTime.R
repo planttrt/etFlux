@@ -9,7 +9,7 @@ site <- 'ChR'
 
 addSensPlots <- function(site, cols=c('#000000', '#808080', '#80808080',
                                       '#000000', '#808080', '#80808080')){
-  plot(NA, xlim=c(1,365), ylim=rev(c(-2,0)), xlab='', ylab='', xaxt='n')
+  plot(NA, xlim=c(1,365), ylim=rev(c(-1.3,-.75)), xlab='', ylab='', xaxt='n')
   annualMean <- ameriLST[Site==site, .(TA=mean(TA, na.rm=T), TS=mean(LST, na.rm=T)), DOY]
   TA <- annualMean[order(DOY), TA]
   TS <- annualMean[order(DOY), TS]
@@ -39,7 +39,7 @@ for(i in 1:length(sitesList)){
   if(i==3)
   {
     plot(1, type="n", axes=F, xlab="", ylab="")
-    legend(legend = c('w.r.t. ∆T', 'w.r.t. S'),
+    legend(legend = c('w.r.t. ∆T', 'w.r.t. TS'),
            fill = cols[c(2,5)],
                'center', bty='n', cex=3, horiz = F, text.font = 2)
     
