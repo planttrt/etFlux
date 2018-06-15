@@ -45,6 +45,9 @@ plot(physio, add=T)
 mtext('(b) Sensitivity to surface temperature, Jul-Aug-Sept', font=2, line = 0, cex=1)
 insertLegend(quantile(r2, probs=c(.01,.99)), col)
 
+scalebar(d = 1000, xy = c(-122, 27),type = 'bar', below = 'kilometers', divs = 4)
+northArrow(xb = -72, yb = 28, len=1.5, lab="N", tcol = 'black', font.lab = 2, col='black')  
+
 Arrows(-65.5, 38, -65.5, 44.5, xpd=T, lwd=2)
 Arrows(-65.5, 33, -65.5, 26.5, xpd=T, lwd=2)
 

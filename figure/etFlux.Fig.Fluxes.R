@@ -5,8 +5,8 @@ fluxes <- c('Net solar (W/m²)',
             'Outgoing thermal (W/m²)',
             'Sensible heat (W/m²)')
 fluxes <- c('R (W/m²)',
-            'L (W/m²)',
-            'O (W/m²)',
+            'LI (W/m²)',
+            'LO (W/m²)',
             'H (W/m²)')
 
 DT <- cbind(perSiteModel$Data[, .(Site, Year, DOY, LST, TA, RS, ET)],
@@ -36,7 +36,7 @@ par(mar=c(0,0,0,0), oma=c(4,4,1,1))
 bp <- boxplot(abs(sapply(genModel$Samples[c("H", "Snet", "THi", "THo")], rowMeans)), outline=F, horizontal=F, col='#bbbbbb', names=NA)
 #c('Sensible heat (H)','Net solar (Snet)','Incoming thermal (THi)','Outgoing thermal (THo)'
 # mtext(text =  c("H", "R", "LI", "LO"), side = 2, at = -70, xpd=T, line = -2.7-seq(0,10.5, length.out = 4), adj=0, font=2, cex=1.7)
-mtext(text =  c("H", "R", "L", "O"), side = 1, at = 1:4, xpd=T, adj=.5, font=2, cex=1.7, line = 2)
+mtext(text =  c("H", "R", "LI", "LO"), side = 1, at = 1:4, xpd=T, adj=.5, font=2, cex=1.7, line = 2)
 mtext('Energy flux (W/m²)', font = 2, cex=1.4, line = 2.5, side = 2)
 dev.off()
 

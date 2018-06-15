@@ -24,4 +24,8 @@ plot(physio, add=T)
 mtext('Thermal stress (∆T)', cex=2, font=2, line = 0)
 mtext('(b)', cex=2, font=2, line = 0, adj=0)
 
+scalebar(d = 1000, xy = c(-122, 27),type = 'bar', below = 'kilometers', divs = 4)
+northArrow(xb = -72, yb = 28, len=1.5, lab="N", tcol = 'black', font.lab = 2, col='black')  
+
+
 dev.off()

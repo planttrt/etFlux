@@ -6,7 +6,7 @@ source('etFlux.LoadData.R')
 load('ameri.RData')
 LST <- etFlux.LoadLSTData()
 
-ameriLST <- etFlux.LoadData(ameri, LST)
+ameriLST <- etFlux.MergeData(ameri, LST)
 
 # sitesList <- c('ChR', 'Dk2', 'Dk3', 'NC2')
 sitesList <- c('ChR',  'Dk2',  'Dk3', 'NC2', 'MRf')
@@ -16,7 +16,7 @@ table(ameriLST[,Site])
 perSiteModel <- etFlux.Model(ameriLST, 
                              useWindData = F,
                              perSite = T,
-                             SitesList = sitesList)
+                             sitesList = sitesList)
 perSiteModel$DT <- JagsOutput2list(perSiteModel)
 
 perSiteModel.Wind <- etFlux.Model(ameriLST,
@@ -50,7 +50,9 @@ sampleOutModel$DT <- JagsOutput2list(sampleOutModel)
 sampleOutModel.Wind <- etFlux.Model(ameriLST, 
                                useWindData = T,
                                perSite = F,
-                               SitesList = c('ChR', 'Dk2', 'NC2'))
+                               sitesList = sitesList
+                               # SitesList = c('ChR', 'Dk2', 'NC2')
+                               )
 sampleOutModel.Wind$DT <- JagsOutput2list(sampleOutModel.Wind)
 
 save.image(file='etFlux.RData')

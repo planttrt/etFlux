@@ -34,21 +34,22 @@ tblSite$CC <- c(1.0,   1.0,   1.00,  1.00,  NA,   0.70,  0.90,  0.10,  0.60,  0.
 tblSite$CC <- c(1.0,   1.0,   0.95,  1.20,  NA,   0.80,  0.90,  0.10,  0.60,  0.80,  0.30,  .85,  0.80)
 tblSite$CC <- c(1.0,   1.0,   1.00,  1.00,  NA,   1.00,  0.90,  0.10,  0.60,  0.80,  0.30,  1.0,  0.80)
 tblSite$CC <- c(1.0,   1.0,   1.00,  0.90,  NA,   0.90,  0.90,  0.10,  0.60,  0.80,  0.30,  0.9,  0.80)
-tblSite$CC <- c(0.85,  0.9,   0.90,  0.85,  NA,   0.7,  0.90,  0.10,  0.60,  0.80,  0.30,  1.0,  0.80)
-tblSite$CC <- 1
-tblSite$CC <- NA
+tblSite$CC <- c(0.85,  0.9,   0.90,  0.85,  NA,   0.7,  0.50,  0.10,  0.60,  0.80,  0.30,  1.0,  0.80)
+# tblSite$CC <- 1
+# tblSite$CC <- NA
 
-sitesList <- c("ChR", "Dk2", "Dk3", "MRf", "NC2")
+sitesList <- c("ChR", "Dk2", "Dk3", "MRf", "NC2", 'Me2')
 siteNames <- c('Chestnut Ridge',
                'Duke Hardwoods',
                'Duke Loblolly',
                "Mary's River Fir",
                'Loblolly Plantation',
+               'Metolius',
                'Average Model')
 sitesList <- tblSite[Site%in%sitesList, Site]
 # siteNames <- sitesList
-
-tblSite[Site%in%sitesList, ]$CC <- c(1, 1, 1, 1.1, .7)
+# tblSite$CC <- 1
+# tblSite[Site%in%sitesList, ]$CC <- c(1, 1, 1, 1.1, .7)
 cc <- tblSite[Site%in%sitesList, CC]
 tblSite
 sitesList
@@ -83,5 +84,5 @@ genModel <- etFlux.Model(ameriLST,
 genModel$DT <- JagsOutput2list(genModel)
 
 # save(list = c('outNoWind', 'outWind', 'perSiteModel', 'genModel'), file = 'out2.RData')
-save.image('figure/5sites.RData')
+save.image('figure/6sites.RData')
 

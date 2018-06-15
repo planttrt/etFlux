@@ -31,7 +31,7 @@ par(mfrow = c(2,3))
 par(oma=c(5,5,1,1),  mar=c(0,0,0,0), pty = "s", xaxt='n', yaxt='n')
 
 for(i in 1:length(sitesList)){
-  if(i==3) plot(1, type="n", axes=F, xlab="", ylab="")
+  # if(i==3) plot(1, type="n", axes=F, xlab="", ylab="")
   s <- sitesList[i]
   obs <- oneOutPrediction[[s]]$obs/24
   pred <- oneOutPrediction[[s]]$pred/24

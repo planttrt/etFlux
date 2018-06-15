@@ -50,8 +50,8 @@ predictET <- function(df, samples=NULL, useWindData = T, CC = rep(1, nrow(df))){
 
 
 etFlux.Model <- function(ameriLST, 
-                         nburnin = 500,
-                         ngibbs = 500,
+                         nburnin = 200,
+                         ngibbs = 300,
                          n.chains = 1,
                          quiet = F,
                          useWindData = T,
